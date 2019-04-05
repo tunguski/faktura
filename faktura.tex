@@ -1,0 +1,65 @@
+\documentclass[12pt]{article}
+\usepackage[MeX]{polski}
+\usepackage[utf8]{inputenc}
+
+\setlength{\marginparwidth}{0pt}
+\setlength{\parindent}{0pt}
+\addtolength{\hoffset}{-50pt}
+\pagestyle{empty}
+
+\begin{document}
+
+\begin{tabular}{p{0.8\textwidth} l l}
+    & Data sprzedaży: & {{ .Invoice.SellDate }} \\
+    & Data wystawienia: & {{ .Invoice.IssueDate  }} \\
+\end{tabular}
+
+\vspace{2cm}
+
+\centerline{\hspace{50pt}\LARGE{Faktura VAT nr {{ .Invoice.Number }} }}
+
+\vspace{2cm}
+
+\begin{tabular}{p{0.5\textwidth} l}
+    \textit{Sprzedawca:} & \textit{Nabywca:} \\
+    {{ .Seller.Name }} & {{ .Buyer.Name }} \\
+    {{ .Seller.Address }} & {{ .Buyer.Address }} \\
+    {{ .Seller.Address2 }} & {{ .Buyer.Address2 }} \\
+    NIP {{ .Seller.Nip }} & NIP {{ .Buyer.Nip }}
+\end{tabular}
+
+\vspace{2cm}
+
+\begin{scriptsize}
+  \begin{tabular}{r l r r r r r r r }
+  Lp & Nazwa usługi & j.m. & Ilość & Cena & Wartość netto & VAT & Wartość VAT & Wartość brutto \\ 
+
+{{ range $index, $value := .Invoice.InvoiceEntries }}
+  \hline
+      {{ inc $index  }}. & {{ $value.Description }} & {{ $value.QuantityUnit }} & {{ $value.Quantity }} & {{ $value.PriceNet | FormatDecimal }} & {{ $value.NetValue.String }} & {{ $value.Vat }}\% & {{ $value.TaxValue.String }} & {{ $value.GrossValue.String }} \\
+{{ end }}
+
+\hline
+   & & & & Razem: & {{ .Invoice.NetValueSum.String }} & & {{ .Invoice.TaxValueSum }} & {{ .Invoice.GrossValueSum }} \\
+
+{{ range $index, $value := .Invoice.NetValueGrouped }}
+      & & & & {{ if not $index }} W tym: {{ end }} & {{ $value.NetValue.String }} & {{ $value.Tax }}\% & {{ $value.TaxValue.String }} & {{ $value.GrossValue.String }} \\
+{{ end }}
+  
+ \end{tabular}
+\end{scriptsize}
+
+\vspace{1cm}
+
+\begin{small}
+ Słownie: {{ valToPolishText .Invoice.GrossValueSum }} \\
+\end{small}
+
+
+\vspace{1cm}
+
+ Forma płatności: PRZELEW \\
+ Rachunek bankowy: {{ .Seller.BankAccount }} \\
+ Termin płatności: {{ .Invoice.DueDate }} \\
+
+\end{document}

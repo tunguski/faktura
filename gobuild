@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Force the go compiler to use modules
+#export GO111MODULE=on
+
+export GOPATH="/code/"
+
+go get github.com/urfave/cli
+go get github.com/BurntSushi/toml
+go get github.com/shopspring/decimal
+go get github.com/moul/number-to-words/cmd/number-to-words
+
+time go build -o /code/bin/faktura -i -v /code/src/*.go
+#time go install 
