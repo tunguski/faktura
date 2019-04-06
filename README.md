@@ -35,7 +35,28 @@ OPTIONS:
 
 #### Modify party
 
-TODO 
+```
+NAME:
+   faktura party modify - Modify party
+
+USAGE:
+   faktura party modify [command options] [arguments...]
+
+OPTIONS:
+   --code value               Code of the party
+   --name value               Name of the party
+   --address value            Address of the party
+   --address2 value           Second address line of the party
+   --nip value                NIP of the party
+   --regon value              Regon of the party
+   --numbering-pattern value  Invoice numbering pattern
+   --active-from value        Start date from which this version is actual
+```
+
+#### Configure
+
+* [ ] Set default party
+* [ ] Set invoice numbering pattern
 
 #### Add invoice
 

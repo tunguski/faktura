@@ -30,6 +30,46 @@ func addParty(c *cli.Context) error {
 		c.String("address"),
 		c.String("address2"),
 		c.String("bankAccount"),
+		"",
+		time.Now()}
+
+	fmt.Println(code)
+	out, _ := json.Marshal(party)
+	fmt.Println(string(out))
+
+	var data = readConfig()
+
+	if _, ok := data.Parties[code]; ok {
+		fmt.Println("" + code + " already defined")
+		os.Exit(1)
+	}
+
+	data.Parties[code] = *party
+
+	storeData(".out.toml", data)
+
+	return nil
+}
+
+func validateModifyParty(c *cli.Context) error {
+	if c.String("code") == "" {
+		fmt.Println("Code is required")
+		cli.ShowCommandHelp(c, "modify")
+		return errors.New("missing_data")
+	}
+	return nil
+}
+
+func modifyParty(c *cli.Context) error {
+	code := c.String("code")
+	party := &Party{
+		c.String("name"),
+		c.String("nip"),
+		c.String("regon"),
+		c.String("address"),
+		c.String("address2"),
+		c.String("bankAccount"),
+		"",
 		time.Now()}
 
 	fmt.Println(code)

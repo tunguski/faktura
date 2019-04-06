@@ -14,6 +14,7 @@ type Party struct {
 	Address string
 	Address2 string
 	BankAccount string
+	InvoiceNumberingPattern string
 	Version time.Time
 }
 
@@ -38,8 +39,7 @@ type Invoice struct {
 }
 
 type Data struct {
-	Name string
-	Nip string
+	DefaultParty string
 	Parties map[string]Party
 	Invoices map[string][]Invoice
 }

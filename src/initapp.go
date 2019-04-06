@@ -64,6 +64,23 @@ func initApp() *cli.App {
 						stringFlag("regon", "Regon of the party"),
 					},
 				},
+				{
+					Name: "modify",
+					Usage: "Modify party",
+					Action: func(c *cli.Context) error {
+						return process(c, validateModifyParty, modifyParty)
+			        },
+					Flags: []cli.Flag {
+						stringFlag("code", "Code of the party"),
+						stringFlag("name", "Name of the party"),
+						stringFlag("address", "Address of the party"),
+						stringFlag("address2", "Second address line of the party"),
+						stringFlag("nip", "NIP of the party"),
+						stringFlag("regon", "Regon of the party"),
+						stringFlag("numbering-pattern", "Invoice numbering pattern"),
+						stringFlag("active-from", "Start date from which this version is actual"),
+					},
+				},
 			},
 		},
 		{
