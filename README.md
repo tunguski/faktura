@@ -13,6 +13,71 @@
 
 This application should conform to Unix philosophy.
 
+### Available commands
+
+#### Add party
+
+```
+AME:
+   faktura party add - Add new party
+
+USAGE:
+   faktura party add [command options] [arguments...]
+
+OPTIONS:
+   --code value      Code of the party
+   --name value      Name of the party
+   --address value   Address of the party
+   --address2 value  Second address line of the party
+   --nip value       NIP of the party
+   --regon value     Regon of the party
+```
+
+#### Modify party
+
+TODO 
+
+#### Add invoice
+
+```
+NAME:
+   faktura invoice add - Add new invoice
+
+USAGE:
+   faktura invoice add [command options] [arguments...]
+
+OPTIONS:
+   --buyer value           Code of the buyer
+   --seller value          Name of the seller
+   --issuanceDate value    Date of issuance
+   --issuancePlace value   Place of issuance
+   --sellDate value        Sell date
+   --positionFormat value  Defines input format of the positions
+   --positions value       Positions declared on invoice
+```
+
+#### Modify invoice
+
+TODO
+
+#### Delete invoice
+
+TODO
+
+#### Print invoice
+
+```
+NAME:
+   faktura generate invoice - Print invoice
+
+USAGE:
+   faktura generate invoice [command options] [arguments...]
+
+OPTIONS:
+   --party value  Code of the party
+   --last         Generate last invoice created for the party``
+```
+
 ## Docker image content
 
 Final docker image should contain application itself
