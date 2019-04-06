@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"fmt"
 	"bufio"
 	"os"
@@ -54,10 +53,10 @@ func printInvoice(c *cli.Context) error {
 			},
 			"valToPolishText": valToPolishText,
 		}).Parse(string(dat))
-	if err != nil { panic(err) }
+	if err != nil { return err }
 	writer := bufio.NewWriter(file)
 	err = tmpl.Execute(writer, templateData)
-	if err != nil { panic(err) }
+	if err != nil { return err }
 	writer.Flush()
 	file.Close()
 
@@ -67,7 +66,8 @@ func printInvoice(c *cli.Context) error {
 	cmd.Stderr = os.Stderr
 	err = cmd.Run()
 	if err != nil {
-		log.Fatalf("cmd.Run() failed with %s\n", err)
+		fmt.Println("cmd.Run() failed with %s\n", err)
+		return err
 	}
 
 	return nil
