@@ -56,7 +56,6 @@ OPTIONS:
 #### Configure
 
 * [ ] Set default party
-* [ ] Set invoice numbering pattern
 
 #### Add invoice
 

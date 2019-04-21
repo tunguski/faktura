@@ -52,14 +52,16 @@
 \vspace{1cm}
 
 \begin{small}
- Słownie: {{ valToPolishText .Invoice.GrossValueSum }} \\
+    \textit{Słownie:} {{ valToPolishText .Invoice.GrossValueSum }} \\
 \end{small}
 
 
 \vspace{1cm}
 
- Forma płatności: PRZELEW \\
- Rachunek bankowy: {{ .Seller.BankAccount }} \\
- Termin płatności: {{ .Invoice.DueDate }} \\
+\begin{tabular}{p{0.3\textwidth} l}
+    Forma płatności & PRZELEW \\
+    Rachunek bankowy & {{ .Seller.BankAccount }} \\
+    Termin płatności & {{ .Invoice.DueDate }} \\
+\end{tabular}
 
 \end{document}
