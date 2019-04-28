@@ -45,6 +45,15 @@ func readConfig() *Data {
 	if _, err := toml.DecodeFile(configfile, &config); err != nil {
 		log.Fatal(err)
 	}
+
+	if config.Parties == nil {
+		config.Parties = make(map[string]Party)
+	}
+
+	if config.Invoices == nil {
+		config.Invoices = make(map[string][]Invoice)
+	}
+
 	return &config
 }
 

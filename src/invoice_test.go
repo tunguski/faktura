@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -35,17 +36,20 @@ func TestAddInvoice(t *testing.T) {
 		"buyer":         "pzu",
 		"issuanceDate":  "2019-04-04",
 		"issuancePlace": "Warszawa",
-		"positions":     "none;0"})
+		"positions":     "zadanie 1;30\nzadanie 2;75\nzadanie 3; 100"})
 	configfile = "../.out.toml"
 
 	// when
 	data, err := addInvoiceNoStore(flags)
+	//fmt.Printf("Data: %v", data)
 
 	// then
 	if err != nil {
 		t.Errorf("Expected nil but got %v", err)
 	}
-	if data == nil {
-		t.Errorf("No data returned")
+	invoice := data.Invoices["test"][0]
+	if len(invoice.InvoiceEntries) != 3 {
+		fmt.Printf("Invoice: %v", invoice)
+		t.Errorf("Expected 2 invoice positions but got %d", len(invoice.InvoiceEntries))
 	}
 }

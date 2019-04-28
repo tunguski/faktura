@@ -26,17 +26,27 @@ func parsePositions(text string) ([]InvoiceEntry, error) {
 		split[index] = strings.Split(element, ";")
 	}
 
-	for _, element := range split {
-		if len(split[0]) != len(element) {
-			return nil, errors.New("Unparseable positions")
+	positions := make([]InvoiceEntry, 0)
+
+	for index, element := range split {
+		size := len(element)
+		position := InvoiceEntry{
+			"",
+			"",
+			"1",
+			"szt.",
+			"",
+			"23",
 		}
+
+		if size == 2 {
+			position.Description = element[0]
+			position.PriceNet = element[1]
+		} else {
+			return nil, errors.New(fmt.Sprintf("Could not parse position %d: %s", index, lines[index]))
+		}
+		positions = append(positions, position)
 	}
-
-	positions := make([]InvoiceEntry, length)
-
-	//for index, element := range split {
-
-	//}
 
 	return positions, nil
 }
@@ -53,6 +63,10 @@ func addInvoiceNoStore(c paramsAccessor) (*Data, error) {
 	dueDate := c.String("dueDate")
 	// TODO: set default seller if empty
 	seller := c.String("seller")
+	if seller == "" {
+		seller = "test"
+	}
+
 	buyer := c.String("buyer")
 
 	invoice := Invoice{
@@ -67,12 +81,12 @@ func addInvoiceNoStore(c paramsAccessor) (*Data, error) {
 	}
 
 	data := readConfig()
-	invoices, ok := data.Invoices["test"]
+	invoices, ok := data.Invoices[seller]
 	if !ok {
 		invoices = []Invoice{}
 	}
 
-	data.Invoices["test"] = append(invoices, invoice)
+	data.Invoices[seller] = append(invoices, invoice)
 
 	return data, nil
 }
