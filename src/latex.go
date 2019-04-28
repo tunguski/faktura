@@ -1,32 +1,30 @@
 package main
 
 import (
-	"fmt"
 	"bufio"
-	"os"
 	"errors"
+	"fmt"
+	"os"
 	"os/exec"
 	"text/template"
-	"github.com/urfave/cli"
 )
 
 type InvoicePrintData struct {
 	Invoice Invoice
-	Seller Party
-	Buyer Party
+	Seller  Party
+	Buyer   Party
 }
 
-func validatePrintInvoice(c *cli.Context) error {
-	if c.String("party") == "" || 
+func validatePrintInvoice(c paramsAccessor) error {
+	if c.String("party") == "" ||
 		c.String("last") == "" {
-		fmt.Println("Party code and invoice specification is required\n")
-		cli.ShowCommandHelp(c, "add")
+		fmt.Printf("Party code and invoice specification is required\n")
 		return errors.New("missing_param")
 	}
 	return nil
 }
 
-func printInvoice(c *cli.Context) error {
+func printInvoice(c paramsAccessor) error {
 	party := c.String("party")
 	last := c.Bool("last")
 
@@ -39,37 +37,42 @@ func printInvoice(c *cli.Context) error {
 
 	templateData := InvoicePrintData{
 		Invoice: invoice,
-		Seller: data.Parties[invoice.Seller],
-		Buyer: data.Parties[invoice.Buyer],
+		Seller:  data.Parties[invoice.Seller],
+		Buyer:   data.Parties[invoice.Buyer],
 	}
 
 	file, err := os.Create("tmp/invoice_source")
-	if err != nil { panic(err) }
+	if err != nil {
+		panic(err)
+	}
 
 	tmpl, err := template.New("invoice").Funcs(map[string]interface{}{
-			"FormatDecimal": FormatDecimal,
-			"inc": func (i int) int {
-				return i + 1
-			},
-			"valToPolishText": valToPolishText,
-		}).Parse(string(dat))
-	if err != nil { return err }
+		"FormatDecimal": FormatDecimal,
+		"inc": func(i int) int {
+			return i + 1
+		},
+		"valToPolishText": valToPolishText,
+	}).Parse(string(dat))
+	if err != nil {
+		return err
+	}
 	writer := bufio.NewWriter(file)
 	err = tmpl.Execute(writer, templateData)
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 	writer.Flush()
 	file.Close()
 
-	cmd := exec.Command("pdflatex", "invoice_source")//, "--output-directory=data/pdf")
+	cmd := exec.Command("pdflatex", "invoice_source") //, "--output-directory=data/pdf")
 	cmd.Dir = "tmp"
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err = cmd.Run()
 	if err != nil {
-		fmt.Println("cmd.Run() failed with %s\n", err)
+		fmt.Printf("cmd.Run() failed with %s\n", err)
 		return err
 	}
 
 	return nil
 }
-

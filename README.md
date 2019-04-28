@@ -112,6 +112,12 @@ Automated build script is defined:
 ./build.sh
 ```
 
+Simple rebuild and exec loop
+
+```sh
+sudo rm -f bin/* && ./build.sh && ./bin/faktura generate invoice --party matsuo --last
+```
+
 ## Tasks
 
 * [ ] Enable golang modules

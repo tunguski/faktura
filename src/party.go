@@ -1,27 +1,27 @@
 package main
 
 import (
-	"os"
-	"fmt"
 	"errors"
+	"fmt"
 	"time"
-	"encoding/json"
-	"github.com/urfave/cli"
 )
 
-func validateAddParty(c *cli.Context) error {
-	if c.String("name") == "" || 
-		c.String("code") == "" || 
-		c.String("address") == "" || 
+func validateAddParty(c paramsAccessor) error {
+	if c.String("name") == "" ||
+		c.String("code") == "" ||
+		c.String("address") == "" ||
 		c.String("nip") == "" {
-		fmt.Println("Code, name, address and nip are required\n")
-		cli.ShowCommandHelp(c, "add")
+		fmt.Printf("Code, name, address and nip are required: %s; %s; %s; %s\n",
+			c.String("name"),
+			c.String("code"),
+			c.String("address"),
+			c.String("nip"))
 		return errors.New("missing_data")
 	}
 	return nil
 }
 
-func addParty(c *cli.Context) error {
+func addPartyNoStore(c paramsAccessor) (*Data, error) {
 	code := c.String("code")
 	party := &Party{
 		c.String("name"),
@@ -34,58 +34,84 @@ func addParty(c *cli.Context) error {
 		time.Now()}
 
 	fmt.Println(code)
-	out, _ := json.Marshal(party)
-	fmt.Println(string(out))
 
 	var data = readConfig()
 
 	if _, ok := data.Parties[code]; ok {
-		fmt.Println("" + code + " already defined")
-		os.Exit(1)
+		return nil, errors.New("" + code + " already defined")
 	}
 
 	data.Parties[code] = *party
 
-	storeData(".out.toml", data)
-
-	return nil
+	return data, nil
 }
 
-func validateModifyParty(c *cli.Context) error {
+func addParty(c paramsAccessor) error {
+	data, err := addPartyNoStore(c)
+
+	storeData(data)
+
+	return err
+}
+
+func validateModifyParty(c paramsAccessor) error {
 	if c.String("code") == "" {
 		fmt.Println("Code is required")
-		cli.ShowCommandHelp(c, "modify")
 		return errors.New("missing_data")
 	}
 	return nil
 }
 
-func modifyParty(c *cli.Context) error {
+func modifyPartyNoStore(c paramsAccessor) (*Data, error) {
 	code := c.String("code")
-	party := &Party{
-		c.String("name"),
-		c.String("nip"),
-		c.String("regon"),
-		c.String("address"),
-		c.String("address2"),
-		c.String("bankAccount"),
-		"",
-		time.Now()}
-
-	fmt.Println(code)
-	out, _ := json.Marshal(party)
-	fmt.Println(string(out))
+	//party := &Party{
+	//	c.String("name"),
+	//	c.String("nip"),
+	//	c.String("regon"),
+	//	c.String("address"),
+	//	c.String("address2"),
+	//	c.String("bankAccount"),
+	//	"",
+	//	time.Now()}
 
 	var data = readConfig()
 
-	if _, ok := data.Parties[code]; ok {
-		fmt.Println("" + code + " already defined")
-		os.Exit(1)
+	if party, ok := data.Parties[code]; ok {
+		fmt.Println(code)
+
+		if c.IsSet("name") {
+			party.Name = c.String("name")
+		}
+		if c.IsSet("nip") {
+			party.Nip = c.String("nip")
+		}
+		if c.IsSet("regon") {
+			party.Regon = c.String("regon")
+		}
+		if c.IsSet("address") {
+			party.Address = c.String("address")
+		}
+		if c.IsSet("address2") {
+			party.Address2 = c.String("address2")
+		}
+		if c.IsSet("bankAccount") {
+			party.BankAccount = c.String("bankAccount")
+		}
+		if c.IsSet("numbering-pattern") {
+			party.InvoiceNumberingPattern = c.String("numbering-pattern")
+		}
+
+		data.Parties[code] = party
+		return data, nil
+	} else {
+		return nil, errors.New("" + code + " not found")
 	}
+}
 
-	data.Parties[code] = *party
+func modifyParty(c paramsAccessor) error {
+	data, err := modifyPartyNoStore(c)
 
-	storeData(".out.toml", data)
+	storeData(data)
 
-	return nil
+	return err
 }

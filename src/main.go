@@ -1,11 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
-	"bytes"
-	"io/ioutil"
 
 	"github.com/BurntSushi/toml"
 )
@@ -30,8 +30,8 @@ func loadFile(filename string) []byte {
 		dat, err = ioutil.ReadFile(filename)
 		if err != nil {
 			log.Fatal("Could not read file")
-		//} else {
-		//	fmt.Println(string(dat))
+			//} else {
+			//	fmt.Println(string(dat))
 		}
 	}
 	return dat
@@ -40,7 +40,7 @@ func loadFile(filename string) []byte {
 // Reads info from config file
 func readConfig() *Data {
 	loadFile(configfile)
-	
+
 	var config Data
 	if _, err := toml.DecodeFile(configfile, &config); err != nil {
 		log.Fatal(err)
@@ -48,17 +48,16 @@ func readConfig() *Data {
 	return &config
 }
 
-func storeData(filename string, data *Data) {
+func storeData(data *Data) {
 	buf := new(bytes.Buffer)
 	if err := toml.NewEncoder(buf).Encode(data); err != nil {
-	    log.Fatal(err)
+		log.Fatal(err)
 	}
 	fmt.Println(buf.String())
 
 	message := []byte(buf.String())
-	err := ioutil.WriteFile(filename, message, 0644)
+	err := ioutil.WriteFile(configfile, message, 0644)
 	if err != nil {
-	    log.Fatal(err)
+		log.Fatal(err)
 	}
 }
-

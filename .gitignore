@@ -4,6 +4,9 @@
 config.toml
 .out*
 *.log
+*.bak
 tmp*
 *.aux
 *.pdf
+*.swp
+*.swo
