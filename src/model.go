@@ -1,57 +1,57 @@
 package main
 
 import (
-	"time"
 	"github.com/shopspring/decimal"
 	"regexp"
 	"sort"
+	"time"
 )
 
 type Party struct {
-	Name string
-	Nip string
-	Regon string
-	Address string
-	Address2 string
-	BankAccount string
+	Name                    string
+	Nip                     string
+	Regon                   string
+	Address                 string
+	Address2                string
+	BankAccount             string
 	InvoiceNumberingPattern string
-	Version time.Time
+	Version                 time.Time
 }
 
 type InvoiceEntry struct {
-	Description string
-	Pkwiu string
-	Quantity string
+	Description  string
+	Pkwiu        string
+	Quantity     string
 	QuantityUnit string
-	PriceNet string
-	Vat string
+	PriceNet     string
+	Vat          string
 }
 
 type Invoice struct {
-	Number string
-	Seller string
-	Buyer string
-	IssueDate string
-	IssuePlace string
-	SellDate string
-	DueDate string
+	Number         string
+	Seller         string
+	Buyer          string
+	IssueDate      string
+	IssuePlace     string
+	SellDate       string
+	DueDate        string
 	InvoiceEntries []InvoiceEntry
 }
 
 type Data struct {
 	DefaultParty string
-	Parties map[string]Party
-	Invoices map[string][]Invoice
+	Parties      map[string]Party
+	Invoices     map[string][]Invoice
 }
 
 type Val struct {
 	v decimal.Decimal
-} 
+}
 
 type summary struct {
-	Tax string
-	NetValue Val
-	TaxValue Val
+	Tax        string
+	NetValue   Val
+	TaxValue   Val
 	GrossValue Val
 }
 
@@ -71,7 +71,7 @@ func PolishNum(v string) string {
 	length := len(v)
 	for i, r := range v {
 		result += string(r)
-		if (length - i - 1) % 3 == 0 && i < length - 6 {
+		if (length-i-1)%3 == 0 && i < length-6 {
 			result += " "
 		}
 	}
@@ -92,7 +92,7 @@ func (invoice Invoice) NetValueGrouped() []summary {
 	var groups map[string]summary = make(map[string]summary)
 	for _, entry := range invoice.InvoiceEntries {
 		if _, ok := groups[entry.Vat]; !ok {
-			groups[entry.Vat] = summary {
+			groups[entry.Vat] = summary{
 				entry.Vat,
 				Val{zero},
 				Val{zero},
@@ -100,7 +100,7 @@ func (invoice Invoice) NetValueGrouped() []summary {
 			}
 		}
 		sum := groups[entry.Vat]
-		groups[entry.Vat] = summary {
+		groups[entry.Vat] = summary{
 			entry.Vat,
 			sum.NetValue.Add(entry.NetValue()),
 			sum.TaxValue.Add(entry.TaxValue()),
@@ -109,13 +109,13 @@ func (invoice Invoice) NetValueGrouped() []summary {
 	}
 	var keys []string
 	for k := range groups {
-	    keys = append(keys, k)
+		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 
 	var values []summary
 	for _, k := range keys {
-	    values = append(values, groups[k])
+		values = append(values, groups[k])
 	}
 	return values
 }
@@ -164,10 +164,9 @@ func (entry InvoiceEntry) TaxValue() Val {
 }
 
 func Map(vs []string, f func(string) string) []string {
-    vsm := make([]string, len(vs))
-    for i, v := range vs {
-        vsm[i] = f(v)
-    }
-    return vsm
+	vsm := make([]string, len(vs))
+	for i, v := range vs {
+		vsm[i] = f(v)
+	}
+	return vsm
 }
-

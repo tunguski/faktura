@@ -11,10 +11,16 @@ import (
 )
 
 var (
+	baseDir    string = "."
 	configfile string = "config.toml"
 	fakturaTex string = "faktura.tex"
 	dataFolder string = "data"
+	tmpFolder  string = "tmp"
 )
+
+func getTmpFolder() string {
+	return baseDir + "/" + tmpFolder + "/"
+}
 
 func main() {
 	app := initApp()

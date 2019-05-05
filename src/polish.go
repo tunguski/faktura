@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/shopspring/decimal"
 	"github.com/moul/number-to-words"
+	"github.com/shopspring/decimal"
 )
 
 func valToPolishText(val Val) string {
@@ -18,4 +18,3 @@ func valToPolishText(val Val) string {
 
 	return result
 }
-

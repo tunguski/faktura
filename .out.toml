@@ -1,0 +1,44 @@
+
+name = "My company's data"
+nip = "432 432 32 32"
+defaultParty = "szamoni"
+
+[parties]
+
+    [parties.tortoise]
+    name = "Tortoise"
+    address = "ul. Hemingway'a 8 A"
+    address2 = "04-421 Szczecin"
+    nip = "3333333333"
+
+    [parties.insurance]
+    name = "Insurance S.A."
+    address = "al. Witosa 24"
+    address2 = "Warszawa"
+    nip = "1111111111"
+    bankAccount = "5432 5432 0000 5432 5432 5432"
+
+    [parties.szamoni]
+    name = "Szamoni"
+    address = "ul. Grejeńska 1 m. 10"
+    address2 = "03-300 Otwock"
+    nip = "2222222222"
+    bankAccount = "5432 5432 0000 5432 5432 5432"
+    invoiceNumberingPattern = "FV/{{year}}/{{month}}/{{number}}"
+
+[[invoices.szamoni]]
+number = "FV/2019/04/01"
+seller = "szamoni"
+buyer = "tortoise"
+issueDate = "2019-04-30"
+issuePlace = "Warszawa"
+sellDate = "2019-04-30"
+dueDate = "2019-05-15"
+
+    [[invoices.szamoni.invoiceEntries]]
+    description = """Kosztowne wykonywanie usług"""
+    pkwiu = ""
+    quantity = "199"
+    quantityUnit = ""
+    priceNet = "77.8"
+    vat = "23"

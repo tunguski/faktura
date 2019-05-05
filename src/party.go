@@ -64,16 +64,6 @@ func validateModifyParty(c paramsAccessor) error {
 
 func modifyPartyNoStore(c paramsAccessor) (*Data, error) {
 	code := c.String("code")
-	//party := &Party{
-	//	c.String("name"),
-	//	c.String("nip"),
-	//	c.String("regon"),
-	//	c.String("address"),
-	//	c.String("address2"),
-	//	c.String("bankAccount"),
-	//	"",
-	//	time.Now()}
-
 	var data = readConfig()
 
 	if party, ok := data.Parties[code]; ok {

@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
 	"strings"
+	"text/template"
 )
 
 func validateAddInvoice(c paramsAccessor) error {
@@ -14,16 +17,33 @@ func validateAddInvoice(c paramsAccessor) error {
 		fmt.Println("Buyer, issuanceDate, issuancePlace and positions are required")
 		return errors.New("missing_param")
 	}
+
+	data := readConfig()
+
+	sellerName := c.String("seller")
+	if sellerName == "" {
+		sellerName = data.DefaultParty
+	}
+
+	_, ok := data.Parties[sellerName]
+	if !ok {
+		return errors.New("No party with code " + sellerName + " defined")
+	}
+
 	return nil
 }
 
 func parsePositions(text string) ([]InvoiceEntry, error) {
 	lines := strings.Split(text, "\n")
-	length := len(lines)
-	split := make([][]string, length)
+	split := make([][]string, 0)
 
-	for index, element := range lines {
-		split[index] = strings.Split(element, ";")
+	for _, element := range lines {
+		trimmed := strings.TrimSpace(element)
+		if trimmed != "" &&
+			!strings.HasPrefix(trimmed, "//") &&
+			!strings.HasPrefix(trimmed, "#") {
+			split = append(split, strings.Split(element, ";"))
+		}
 	}
 
 	positions := make([]InvoiceEntry, 0)
@@ -42,8 +62,31 @@ func parsePositions(text string) ([]InvoiceEntry, error) {
 		if size == 2 {
 			position.Description = element[0]
 			position.PriceNet = element[1]
+		} else if size == 3 {
+			position.Description = element[0]
+			position.PriceNet = element[1]
+			position.Vat = element[2]
+		} else if size == 4 {
+			position.Description = element[0]
+			position.Quantity = element[1]
+			position.PriceNet = element[2]
+			position.Vat = element[3]
+		} else if size == 5 {
+			position.Description = element[0]
+			position.Pkwiu = element[1]
+			position.Quantity = element[2]
+			position.PriceNet = element[3]
+			position.Vat = element[4]
+		} else if size == 6 {
+			position.Description = element[0]
+			position.Pkwiu = element[1]
+			position.Quantity = element[2]
+			position.QuantityUnit = element[3]
+			position.PriceNet = element[4]
+			position.Vat = element[5]
 		} else {
-			return nil, errors.New(fmt.Sprintf("Could not parse position %d: %s", index, lines[index]))
+			return nil, fmt.Errorf(
+				"Could not parse position %d: %s", index, lines[index])
 		}
 		positions = append(positions, position)
 	}
@@ -58,20 +101,22 @@ func addInvoiceNoStore(c paramsAccessor) (*Data, error) {
 		return nil, err
 	}
 
+	data := readConfig()
+
 	issuanceDate := c.String("issuanceDate")
 	sellDate := c.String("sellDate")
 	dueDate := c.String("dueDate")
 	// TODO: set default seller if empty
-	seller := c.String("seller")
-	if seller == "" {
-		seller = "test"
+	sellerName := c.String("seller")
+	if sellerName == "" {
+		sellerName = data.DefaultParty
 	}
 
 	buyer := c.String("buyer")
 
 	invoice := Invoice{
-		"invoice-number",
-		seller,
+		"<nil>",
+		sellerName,
 		buyer,
 		issuanceDate,
 		c.String("issuancePlace"),
@@ -79,16 +124,67 @@ func addInvoiceNoStore(c paramsAccessor) (*Data, error) {
 		dueDate,
 		positions,
 	}
+	err = generateInvoiceNumber(&invoice, data)
+	if err != nil {
+		return nil, err
+	}
 
-	data := readConfig()
-	invoices, ok := data.Invoices[seller]
+	invoices, ok := data.Invoices[sellerName]
 	if !ok {
 		invoices = []Invoice{}
 	}
 
-	data.Invoices[seller] = append(invoices, invoice)
+	data.Invoices[sellerName] = append(invoices, invoice)
 
 	return data, nil
+}
+
+type generateInvoiceNumberData struct {
+	Year   string
+	Month  string
+	Number string
+}
+
+func createInvoiceNumberData(invoice *Invoice, data *Data) generateInvoiceNumberData {
+	year := "2010"
+	month := "00"
+	number := "00"
+
+	if split := strings.Split(invoice.IssueDate, "-"); len(split) > 2 {
+		year = split[0]
+		month = split[1]
+	} else if split = strings.Split(invoice.IssueDate, "/"); len(split) > 2 {
+		year = split[0]
+		month = split[1]
+	}
+
+	return generateInvoiceNumberData{
+		Year:   year,
+		Month:  month,
+		Number: number,
+	}
+}
+
+func generateInvoiceNumber(invoice *Invoice, data *Data) error {
+	var numberTemplate = "FV/{{.Year}}/{{.Month}}/{{.Number}}"
+	tmpl, err := template.
+		New("invoice").
+		//Funcs(templateFunctions()).
+		Parse(numberTemplate)
+	if err != nil {
+		return err
+	}
+	var b bytes.Buffer
+	writer := bufio.NewWriter(&b)
+	err = tmpl.Execute(writer, createInvoiceNumberData(invoice, data))
+	if err != nil {
+		return err
+	}
+	writer.Flush()
+
+	invoice.Number = b.String()
+
+	return nil
 }
 
 func addInvoice(c paramsAccessor) error {

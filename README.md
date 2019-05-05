@@ -115,7 +115,7 @@ Automated build script is defined:
 Simple rebuild and exec loop
 
 ```sh
-sudo rm -f bin/* && ./build.sh && ./bin/faktura generate invoice --party matsuo --last
+sudo rm -f bin/* && ./build.sh && ./bin/faktura generate invoice --party [party_code] --last
 ```
 
 ## Tasks

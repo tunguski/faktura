@@ -135,7 +135,7 @@ func TestValidateModifyParty(t *testing.T) {
 func TestModifyParty(t *testing.T) {
 	// given
 	flags := paramsFromMap(map[string]string{
-		"code":              "matsuo",
+		"code":              "szamoni",
 		"name":              "test-name",
 		"nip":               "test-nip",
 		"regon":             "test-regon",
@@ -155,7 +155,7 @@ func TestModifyParty(t *testing.T) {
 	} else if length := len(data.Parties); length != 3 {
 		t.Errorf("Expected 3 paries but got %d", length)
 	} else {
-		party, _ := data.Parties["matsuo"]
+		party, _ := data.Parties["szamoni"]
 		if party.Name != "test-name" {
 			t.Errorf("Name missmatch: %s", party.Name)
 		}

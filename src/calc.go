@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	zero = (func () decimal.Decimal {
+	zero = (func() decimal.Decimal {
 		num, _ := decimal.NewFromString("0")
 		return num
 	})()
@@ -19,4 +19,3 @@ func sum(values []string) decimal.Decimal {
 	}
 	return result
 }
-
